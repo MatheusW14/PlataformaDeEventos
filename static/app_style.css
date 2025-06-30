@@ -1,0 +1,136 @@
+/* Esquema de Cores e Fundo */
+body {
+    background-color: #f8f9fa; /* Um cinza bem claro para o fundo */
+    color: #212529; /* Cor de texto padrão (escuro) */
+}
+
+/* Ajustes no Título da Página */
+.display-5 {
+    font-weight: 300;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+
+/* Estilo dos Cards de Evento */
+.event-card {
+    border: none; /* Remove a borda padrão do card */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 0.5rem; /* Bordas mais arredondadas */
+}
+
+.event-card:hover {
+    transform: translateY(-5px); /* Efeito de flutuar ao passar o mouse */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.event-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover; /* Garante que a imagem cubra a área sem distorcer */
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+.card-footer {
+    background-color: #ffffff;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Formulários */
+.formularioJogo {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.formularioImagem .img-fluid {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Botão de Upload customizado */
+.fileContainer {
+    display: inline-block;
+    background: #6c757d; /* Cinza secundário do Bootstrap */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    overflow: hidden;
+    position: relative;
+}
+
+.fileContainer:hover {
+    background-color: #5a6268;
+}
+
+.fileContainer [type=file] {
+    cursor: pointer;
+    display: block;
+    font-size: 999px;
+    filter: alpha(opacity=0);
+    min-height: 100%;
+    min-width: 100%;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    top: 0;
+}
+
+/* --- Estilos da Página de Login --- */
+
+.login-card {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 0.75rem; /* Bordas um pouco mais arredondadas */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+.login-card h2 {
+    font-weight: 300;
+    color: #343a40;
+}
+
+/* Ajustes para o formulário flutuante do Bootstrap */
+.form-floating > .form-control {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+}
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+}
+
+.d-grid .btn {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+/* --- Estilos dos Formulários (Novo/Editar) --- */
+
+.form-card {
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+}
+
+.form-image-preview .img-fluid {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1; /* Força a imagem a ter um aspecto quadrado */
+    object-fit: cover;
+}

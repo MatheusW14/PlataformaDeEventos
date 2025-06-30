@@ -1,0 +1,28 @@
+{% extends "template.html" %}
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="login-card">
+            <form method="POST" action="{{ url_for('autenticar') }}">
+                <input type="hidden" name="proxima" value="{{ proxima or url_for('index') }}">
+                {{ form.csrf_token() }}
+
+                <h2 class="text-center mb-4">Acessar sua Conta</h2>
+
+                <div class="form-floating mb-3">
+                    {{ form.nickname(class="form-control", placeholder="Nickname") }}
+                    {{ form.nickname.label }}
+                </div>
+                <div class="form-floating mb-4">
+                    {{ form.senha(class="form-control", placeholder="Senha") }}
+                    {{ form.senha.label }}
+                </div>
+                <div class="d-grid gap-2">
+                    {{ form.login(class="btn btn-primary btn-lg") }}
+                    <a class="btn btn-secondary" href="{{ url_for('index') }}">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "template.html" %}
+{% block conteudo %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for evento in eventos %}
+        <div class="col">
+            <div class="card h-100 shadow-sm event-card">
+                <img src="{{ url_for('imagem', nome_arquivo=recupera_imagem(evento.id)) }}" class="card-img-top event-image" alt="Imagem do Evento">
+                <div class="card-body">
+                    <h5 class="card-title">{{ evento.nome }}</h5>
+                    <p class="card-text text-muted">{{ evento.tema }}</p>
+                    <p class="card-text">{{ evento.descricao }}</p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Data: {{ evento.data.strftime('%d/%m/%Y') }}</small>
+                    {% if 'usuario_logado' in session and session['usuario_logado'] %}
+                    <div class="action-buttons mt-2">
+                        <a href="{{ url_for('editar', id=evento.id) }}" class="btn btn-secondary btn-sm">Editar</a>
+                        <a href="{{ url_for('deletar', id=evento.id) }}" class="btn btn-danger btn-sm">Deletar</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

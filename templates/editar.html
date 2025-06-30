@@ -1,0 +1,49 @@
+{% extends "template.html" %}
+{% block conteudo %}
+<div class="form-card">
+    <form action="{{ url_for('atualizar') }}" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-4">
+                <figure class="form-image-preview">
+                    <img class="img-fluid" src="{{ url_for('imagem', nome_arquivo=capa_evento) }}" alt="Capa do Evento">
+                    <figcaption class="mt-2">
+                        <label class="fileContainer">
+                            Trocar Imagem
+                            <input type="file" name="arquivo" accept=".jpg">
+                        </label>
+                    </figcaption>
+                </figure>
+            </div>
+
+            <div class="col-md-8">
+                <fieldset>
+                    <input type="hidden" name="id" value="{{ id }}">
+                    {{ form.csrf_token() }}
+
+                    <div class="form-floating mb-3">
+                        {{ form.nome(class="form-control", placeholder="Nome do Evento") }}
+                        {{ form.nome.label }}
+                    </div>
+                    <div class="form-floating mb-3">
+                        {{ form.data(class="form-control", placeholder="Data") }}
+                        {{ form.data.label }}
+                    </div>
+                    <div class="form-floating mb-3">
+                        {{ form.tema(class="form-control", placeholder="Tema") }}
+                        {{ form.tema.label }}
+                    </div>
+                    <div class="form-floating mb-3">
+                        {{ form.descricao(class="form-control", placeholder="Descrição", style="height: 100px") }}
+                        {{ form.descricao.label }}
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        {{ form.salvar(class="btn btn-primary") }}
+                        <a class="btn btn-secondary" href="{{ url_for('index') }}">Voltar</a>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
