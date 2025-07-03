@@ -14,11 +14,11 @@ except mysql.connector.Error as err:
 cursor = conn.cursor()
 
 
-cursor.execute("DROP DATABASE IF EXISTS `jogoteca`;")
-cursor.execute("CREATE DATABASE `jogoteca`;")
-cursor.execute("USE `jogoteca`;")
+cursor.execute("DROP DATABASE IF EXISTS `lista_eventos`;")
+cursor.execute("CREATE DATABASE `lista_eventos`;")
+cursor.execute("USE `lista_eventos`;")
 
-# criando tabelas
+
 TABLES = {}
 TABLES["Eventos"] = (
     """
@@ -55,7 +55,7 @@ for tabela_nome in TABLES:
     else:
         print("OK")
 
-# inserindo usuarios
+
 usuario_sql = "INSERT INTO usuarios (nome, nickname, senha) VALUES (%s, %s, %s)"
 usuarios = [
     ("Bruno Divino", "BD", generate_password_hash("alohomora").decode("utf-8")),
@@ -72,15 +72,12 @@ usuarios = [
 ]
 cursor.executemany(usuario_sql, usuarios)
 
-# 2. Corrigindo a seleção de usuários
-cursor.execute(
-    "select * from usuarios"
-)  # Não precisa especificar 'jogoteca.' pois já estamos usando o banco
+
+cursor.execute("select * from usuarios")
 print(" -------------  Usuários:  -------------")
 for user in cursor.fetchall():
     print(user[1])
 
-# Inserindo eventos de exemplo
 eventos_sql = (
     "INSERT INTO eventos (nome, data, tema, descricao) VALUES (%s, %s, %s, %s)"
 )
@@ -106,7 +103,7 @@ eventos = [
 ]
 cursor.executemany(eventos_sql, eventos)
 
-# commitando se não nada tem efeito
+
 conn.commit()
 
 cursor.close()
