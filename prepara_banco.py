@@ -47,10 +47,10 @@ TABLES["Usuarios"] = (
 TABLES["Participantes"] = (
     """
     CREATE TABLE `participantes` (
-        `usuario_nickname` varchar(20) NOT NULL,
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `nome` varchar(100) NOT NULL,
         `evento_id` int(11) NOT NULL,
-        PRIMARY KEY (`usuario_nickname`, `evento_id`),
-        FOREIGN KEY (`usuario_nickname`) REFERENCES `usuarios` (`nickname`),
+        PRIMARY KEY (`id`),
         FOREIGN KEY (`evento_id`) REFERENCES `eventos` (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
     """

@@ -1,16 +1,13 @@
 from lista_eventos import db
 
 
-participantes_eventos = db.Table(
-    "participantes",
-    db.Column(
-        "usuario_nickname",
-        db.String(20),
-        db.ForeignKey("usuarios.nickname"),
-        primary_key=True,
-    ),
-    db.Column("evento_id", db.Integer, db.ForeignKey("eventos.id"), primary_key=True),
-)
+class Participantes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    evento_id = db.Column(db.Integer, db.ForeignKey("eventos.id"), nullable=False)
+
+    def __repr__(self):
+        return f"<Participante {self.nome}>"
 
 
 class Eventos(db.Model):
@@ -21,10 +18,7 @@ class Eventos(db.Model):
     descricao = db.Column(db.String(200), nullable=False)
 
     participantes = db.relationship(
-        "Usuarios",
-        secondary=participantes_eventos,
-        lazy="subquery",
-        back_populates="eventos_participando",
+        "Participantes", backref="evento", lazy=True, cascade="all, delete-orphan"
     )
 
     def __repr__(self):
@@ -35,13 +29,6 @@ class Usuarios(db.Model):
     nickname = db.Column(db.String(20), primary_key=True)
     nome = db.Column(db.String(20), nullable=False)
     senha = db.Column(db.String(100), nullable=False)
-
-    eventos_participando = db.relationship(
-        "Eventos",
-        secondary=participantes_eventos,
-        lazy=True,
-        back_populates="participantes",
-    )
 
     def __repr__(self):
         return f"<Usuario {self.nome}>"

@@ -9,7 +9,7 @@ from flask import (
     current_app,
 )
 from lista_eventos import app, db
-from models import Eventos, Usuarios
+from models import Eventos, Usuarios, Participantes
 from helpers import recupera_imagem, deleta_arquivo, FormularioEvento
 import time
 
@@ -64,6 +64,12 @@ def criar():
         nome=nome, data=data.strftime("%Y-%m-%d"), tema=tema, descricao=descricao
     )
     db.session.add(novo_evento)
+    nomes_participantes = form.participantes_manuais.data.strip().split("\n")
+    for nome in nomes_participantes:
+        if nome:
+            participante = Participantes(nome=nome.strip(), evento=novo_evento)
+            db.session.add(participante)
+
     db.session.commit()
 
     arquivo = request.files["arquivo"]
@@ -84,6 +90,8 @@ def editar(id):
     form.data.data = evento.data
     form.tema.data = evento.tema
     form.descricao.data = evento.descricao
+    nomes_participantes = [p.nome for p in evento.participantes]
+    form.participantes_manuais.data = "\n".join(nomes_participantes)
     capa_evento = recupera_imagem(id)
     return render_template(
         "editar.html",
@@ -109,8 +117,13 @@ def atualizar():
         evento.data = form.data.data
         evento.tema = form.tema.data
         evento.descricao = form.descricao.data
+        evento.participantes.clear()
+        nomes_participantes = form.participantes_manuais.data.strip().split("\n")
+        for nome in nomes_participantes:
+            if nome:
+                participante = Participantes(nome=nome.strip(), evento=evento)
+                db.session.add(participante)
 
-        db.session.add(evento)
         db.session.commit()
 
         arquivo = request.files["arquivo"]
@@ -151,20 +164,21 @@ def imagem(nome_arquivo):
 )
 def participar(id):
     if "usuario_logado" not in session or session["usuario_logado"] is None:
-        flash("Você precisa estar logado para participar de um evento.", "danger")
+        flash("Você precisa estar logado para participar.", "danger")
         return redirect(url_for("login"))
 
     evento = Eventos.query.get_or_404(id)
-    usuario = Usuarios.query.filter_by(nickname=session["usuario_logado"]).first()
+    nickname_logado = session["usuario_logado"]
 
-    if not usuario:
-        flash("Usuário não encontrado. Por favor, faça login novamente.", "danger")
-        return redirect(url_for("login"))
+    participante_existente = Participantes.query.filter_by(
+        evento_id=evento.id, nome=nickname_logado
+    ).first()
 
-    if usuario in evento.participantes:
+    if participante_existente:
         flash("Você já está participando deste evento!", "info")
     else:
-        evento.participantes.append(usuario)
+        novo_participante = Participantes(nome=nickname_logado, evento_id=evento.id)
+        db.session.add(novo_participante)
         db.session.commit()
         flash("Sua participação foi confirmada!", "success")
 
@@ -182,15 +196,14 @@ def desinscrever(id):
         flash("Você precisa estar logado para realizar esta ação.", "danger")
         return redirect(url_for("login"))
 
-    evento = Eventos.query.get_or_404(id)
-    usuario = Usuarios.query.filter_by(nickname=session["usuario_logado"]).first()
+    nickname_logado = session["usuario_logado"]
 
-    if not usuario:
-        flash("Usuário não encontrado.", "danger")
-        return redirect(url_for("login"))
+    participante_para_remover = Participantes.query.filter_by(
+        evento_id=id, nome=nickname_logado
+    ).first()
 
-    if usuario in evento.participantes:
-        evento.participantes.remove(usuario)
+    if participante_para_remover:
+        db.session.delete(participante_para_remover)
         db.session.commit()
         flash("Você saiu do evento.", "success")
     else:

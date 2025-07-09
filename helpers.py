@@ -13,32 +13,29 @@ from wtforms.validators import DataRequired, Length, EqualTo
 
 
 class FormularioEvento(FlaskForm):
-    nome = StringField(
-        "Nome do Evento", [validators.DataRequired(), validators.Length(min=1, max=50)]
+    nome = StringField("Nome do Evento", [DataRequired(), Length(min=1, max=50)])
+    data = DateField("Data do Evento", [DataRequired()], format="%Y-%m-%d")
+    tema = StringField("Tema", [DataRequired(), Length(min=1, max=40)])
+    descricao = TextAreaField("Descrição", [DataRequired(), Length(min=1, max=200)])
+
+    participantes_manuais = TextAreaField(
+        "Participantes (um nome por linha)", render_kw={"rows": 5}
     )
-    data = DateField("Data do Evento", [validators.DataRequired()], format="%Y-%m-%d")
-    tema = StringField(
-        "Tema", [validators.DataRequired(), validators.Length(min=1, max=40)]
-    )
-    descricao = TextAreaField(
-        "Descrição", [validators.DataRequired(), validators.Length(min=1, max=200)]
-    )
+
     salvar = SubmitField("Salvar")
 
 
 class FormularioUsuario(FlaskForm):
-    nickname = StringField(
-        "Usuário", [validators.DataRequired(), validators.Length(min=1, max=20)]
-    )
-    senha = PasswordField(
-        "Senha", [validators.DataRequired(), validators.Length(min=1, max=100)]
-    )
+    nickname = StringField("Nickname", [DataRequired(), Length(min=1, max=20)])
+    senha = PasswordField("Senha", [DataRequired(), Length(min=1, max=100)])
     login = SubmitField("Login")
 
 
 class FormularioCadastro(FlaskForm):
     nome = StringField("Nome Completo", [DataRequired(), Length(min=1, max=20)])
-    nickname = StringField("Usuário", [DataRequired(), Length(min=1, max=20)])
+    nickname = StringField(
+        "Nickname (para login)", [DataRequired(), Length(min=1, max=20)]
+    )
     senha = PasswordField(
         "Senha",
         [
@@ -55,7 +52,6 @@ def recupera_imagem(id):
     for nome_arquivo in os.listdir(current_app.config["UPLOAD_PATH"]):
         if f"capa{id}" in nome_arquivo:
             return nome_arquivo
-
     return "capa_padrao.jpg"
 
 
