@@ -9,7 +9,7 @@ from flask import (
     current_app,
 )
 from lista_eventos import app, db
-from models import Eventos
+from models import Eventos, Usuarios
 from helpers import recupera_imagem, deleta_arquivo, FormularioEvento
 import time
 
@@ -17,7 +17,16 @@ import time
 @app.route("/")
 def index():
     lista = Eventos.query.order_by(Eventos.id)
-    return render_template("lista.html", titulo="Eventos", eventos=lista)
+
+    usuario_logado = None
+    if "usuario_logado" in session and session["usuario_logado"] is not None:
+        usuario_logado = Usuarios.query.filter_by(
+            nickname=session["usuario_logado"]
+        ).first()
+
+    return render_template(
+        "lista.html", titulo="Eventos", eventos=lista, usuario=usuario_logado
+    )
 
 
 @app.route("/novo")
@@ -132,3 +141,59 @@ def deletar(id):
 @app.route("/uploads/<nome_arquivo>")
 def imagem(nome_arquivo):
     return send_from_directory("uploads", nome_arquivo)
+
+
+@app.route(
+    "/participar/<int:id>",
+    methods=[
+        "POST",
+    ],
+)
+def participar(id):
+    if "usuario_logado" not in session or session["usuario_logado"] is None:
+        flash("Você precisa estar logado para participar de um evento.", "danger")
+        return redirect(url_for("login"))
+
+    evento = Eventos.query.get_or_404(id)
+    usuario = Usuarios.query.filter_by(nickname=session["usuario_logado"]).first()
+
+    if not usuario:
+        flash("Usuário não encontrado. Por favor, faça login novamente.", "danger")
+        return redirect(url_for("login"))
+
+    if usuario in evento.participantes:
+        flash("Você já está participando deste evento!", "info")
+    else:
+        evento.participantes.append(usuario)
+        db.session.commit()
+        flash("Sua participação foi confirmada!", "success")
+
+    return redirect(url_for("index"))
+
+
+@app.route(
+    "/desinscrever/<int:id>",
+    methods=[
+        "POST",
+    ],
+)
+def desinscrever(id):
+    if "usuario_logado" not in session or session["usuario_logado"] is None:
+        flash("Você precisa estar logado para realizar esta ação.", "danger")
+        return redirect(url_for("login"))
+
+    evento = Eventos.query.get_or_404(id)
+    usuario = Usuarios.query.filter_by(nickname=session["usuario_logado"]).first()
+
+    if not usuario:
+        flash("Usuário não encontrado.", "danger")
+        return redirect(url_for("login"))
+
+    if usuario in evento.participantes:
+        evento.participantes.remove(usuario)
+        db.session.commit()
+        flash("Você saiu do evento.", "success")
+    else:
+        flash("Você não estava participando deste evento.", "info")
+
+    return redirect(url_for("index"))

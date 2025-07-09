@@ -9,15 +9,38 @@
                     <h5 class="card-title">{{ evento.nome }}</h5>
                     <p class="card-text text-muted">{{ evento.tema }}</p>
                     <p class="card-text">{{ evento.descricao }}</p>
-                </div>
+
+                    <h6 class="mt-3">Participantes ({{ evento.participantes|length }})</h6>
+                    <div class="participants-list mb-3">
+                        {% if evento.participantes %}
+                            {% for participante in evento.participantes %}
+                                <span class="badge bg-secondary">{{ participante.nickname }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted small">Ninguém confirmou presença ainda.</p>
+                        {% endif %}
+                    </div>
+                    </div>
                 <div class="card-footer">
                     <small class="text-muted">Data: {{ evento.data.strftime('%d/%m/%Y') }}</small>
-                    {% if 'usuario_logado' in session and session['usuario_logado'] %}
+
                     <div class="action-buttons mt-2">
-                        <a href="{{ url_for('editar', id=evento.id) }}" class="btn btn-secondary btn-sm">Editar</a>
-                        <a href="{{ url_for('deletar', id=evento.id) }}" class="btn btn-danger btn-sm">Deletar</a>
+                        {% if usuario %}
+                            {% if usuario in evento.participantes %}
+                                <form action="{{ url_for('desinscrever', id=evento.id) }}" method="post" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-warning btn-sm">Sair do Evento</button>
+                                </form>
+                            {% else %}
+                                <form action="{{ url_for('participar', id=evento.id) }}" method="post" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-success btn-sm">Participar</button>
+                                </form>
+                            {% endif %}
+                            <a href="{{ url_for('editar', id=evento.id) }}" class="btn btn-secondary btn-sm">Editar</a>
+                            <a href="{{ url_for('deletar', id=evento.id) }}" class="btn btn-danger btn-sm">Deletar</a>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
