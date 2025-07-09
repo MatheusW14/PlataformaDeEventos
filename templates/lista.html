@@ -1,4 +1,5 @@
 {% extends "template.html" %}
+
 {% block conteudo %}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for evento in eventos %}
@@ -10,20 +11,14 @@
                     <p class="card-text text-muted">{{ evento.tema }}</p>
                     <p class="card-text">{{ evento.descricao }}</p>
 
-                    <h6 class="mt-3">Participantes ({{ evento.participantes|length }})</h6>
-                    <div class="participants-list mb-3">
-                        {% if evento.participantes %}
-                            {% for participante in evento.participantes %}
-                                <span class="badge bg-secondary">{{ participante.nickname }}</span>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-muted small">Ninguém confirmou presença ainda.</p>
-                        {% endif %}
+                    <div class="mb-3">
+                        <a href="#" class="link-primary" data-bs-toggle="modal" data-bs-target="#modal-participantes-{{ evento.id }}">
+                            Ver Participantes ({{ evento.participantes|length }})
+                        </a>
                     </div>
-                    </div>
+                </div>
                 <div class="card-footer">
                     <small class="text-muted">Data: {{ evento.data.strftime('%d/%m/%Y') }}</small>
-
                     <div class="action-buttons mt-2">
                         {% if usuario %}
                             {% if usuario.nickname in evento.participantes|map(attribute='nome')|list %}
@@ -37,7 +32,6 @@
                                     <button type="submit" class="btn btn-success btn-sm">Participar</button>
                                 </form>
                             {% endif %}
-                            
                             <a href="{{ url_for('editar', id=evento.id) }}" class="btn btn-secondary btn-sm">Editar</a>
                             <a href="{{ url_for('deletar', id=evento.id) }}" class="btn btn-danger btn-sm">Deletar</a>
                         {% endif %}
@@ -47,4 +41,32 @@
         </div>
         {% endfor %}
     </div>
+
+    {% for evento in eventos %}
+    <div class="modal fade" id="modal-participantes-{{ evento.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ evento.id }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel-{{ evento.id }}">Participantes de "{{ evento.nome }}"</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {% if evento.participantes %}
+                <ul class="list-group">
+                    {% for participante in evento.participantes %}
+                        <li class="list-group-item">{{ participante.nome }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Ainda não há participantes confirmados para este evento.</p>
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
 {% endblock %}

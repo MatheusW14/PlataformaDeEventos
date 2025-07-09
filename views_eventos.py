@@ -1,3 +1,5 @@
+import time
+import json
 from flask import (
     render_template,
     request,
@@ -11,7 +13,6 @@ from flask import (
 from lista_eventos import app, db
 from models import Eventos, Usuarios, Participantes
 from helpers import recupera_imagem, deleta_arquivo, FormularioEvento
-import time
 
 
 @app.route("/")
@@ -31,7 +32,7 @@ def index():
 
 @app.route("/novo")
 def novo():
-    if "usuario_logado" not in session or session["usuario_logado"] == None:
+    if "usuario_logado" not in session or session["usuario_logado"] is None:
         return redirect(url_for("login", proxima=url_for("novo")))
     form = FormularioEvento()
     return render_template("novo.html", titulo="Novo Evento", form=form)
@@ -47,6 +48,7 @@ def criar():
     form = FormularioEvento(request.form)
 
     if not form.validate_on_submit():
+        flash("Erro no formulário, por favor verifique os dados.", "danger")
         return redirect(url_for("novo"))
 
     nome = form.nome.data
@@ -57,41 +59,48 @@ def criar():
     evento = Eventos.query.filter_by(nome=nome).first()
 
     if evento:
-        flash("Evento já existente!")
+        flash("Evento com este nome já existe!", "warning")
         return redirect(url_for("index"))
 
-    novo_evento = Eventos(
-        nome=nome, data=data.strftime("%Y-%m-%d"), tema=tema, descricao=descricao
-    )
+    novo_evento = Eventos(nome=nome, data=data, tema=tema, descricao=descricao)
     db.session.add(novo_evento)
-    nomes_participantes = form.participantes_manuais.data.strip().split("\n")
-    for nome in nomes_participantes:
-        if nome:
-            participante = Participantes(nome=nome.strip(), evento=novo_evento)
-            db.session.add(participante)
+
+    participantes_data = form.participantes_manuais.data or ""
+    try:
+        tags = json.loads(participantes_data)
+        nomes_participantes = [tag["value"] for tag in tags]
+    except (json.JSONDecodeError, TypeError):
+        nomes_participantes = [
+            nome.strip() for nome in participantes_data.split(",") if nome.strip()
+        ]
+
+    for nome_participante in nomes_participantes:
+        participante = Participantes(nome=nome_participante, evento=novo_evento)
+        db.session.add(participante)
 
     db.session.commit()
 
     arquivo = request.files["arquivo"]
-    upload_path = app.config["UPLOAD_PATH"]
-    timestamp = time.time()
-    arquivo.save(f"{upload_path}/capa{novo_evento.id}-{timestamp}.jpg")
+    if arquivo.filename:
+        upload_path = current_app.config["UPLOAD_PATH"]
+        timestamp = time.time()
+        arquivo.save(f"{upload_path}/capa{novo_evento.id}-{timestamp}.jpg")
 
+    flash("Evento criado com sucesso!", "success")
     return redirect(url_for("index"))
 
 
 @app.route("/editar/<int:id>")
 def editar(id):
-    if "usuario_logado" not in session or session["usuario_logado"] == None:
+    if "usuario_logado" not in session or session["usuario_logado"] is None:
         return redirect(url_for("login", proxima=url_for("editar", id=id)))
-    evento = Eventos.query.filter_by(id=id).first()
-    form = FormularioEvento()
-    form.nome.data = evento.nome
-    form.data.data = evento.data
-    form.tema.data = evento.tema
-    form.descricao.data = evento.descricao
+
+    evento = Eventos.query.get_or_404(id)
+    form = FormularioEvento(obj=evento)
+
     nomes_participantes = [p.nome for p in evento.participantes]
-    form.participantes_manuais.data = "\n".join(nomes_participantes)
+    form.participantes_manuais.data = ",".join(nomes_participantes)
+
     capa_evento = recupera_imagem(id)
     return render_template(
         "editar.html",
@@ -112,48 +121,56 @@ def atualizar():
     form = FormularioEvento(request.form)
 
     if form.validate_on_submit():
-        evento = Eventos.query.filter_by(id=request.form["id"]).first()
+        evento = Eventos.query.get_or_404(request.form["id"])
         evento.nome = form.nome.data
         evento.data = form.data.data
         evento.tema = form.tema.data
         evento.descricao = form.descricao.data
+
         evento.participantes.clear()
-        nomes_participantes = form.participantes_manuais.data.strip().split("\n")
-        for nome in nomes_participantes:
-            if nome:
-                participante = Participantes(nome=nome.strip(), evento=evento)
-                db.session.add(participante)
+        participantes_data = form.participantes_manuais.data or ""
+        try:
+            tags = json.loads(participantes_data)
+            nomes_participantes = [tag["value"] for tag in tags]
+        except (json.JSONDecodeError, TypeError):
+            nomes_participantes = [
+                nome.strip() for nome in participantes_data.split(",") if nome.strip()
+            ]
+
+        for nome_participante in nomes_participantes:
+            participante = Participantes(nome=nome_participante, evento=evento)
+            db.session.add(participante)
 
         db.session.commit()
 
         arquivo = request.files["arquivo"]
-
         if arquivo.filename:
             deleta_arquivo(evento.id)
             upload_path = current_app.config["UPLOAD_PATH"]
             timestamp = time.time()
             arquivo.save(f"{upload_path}/capa{evento.id}-{timestamp}.jpg")
 
+        flash("Evento atualizado com sucesso!", "success")
+
     return redirect(url_for("index"))
 
 
 @app.route("/deletar/<int:id>")
 def deletar(id):
-    if "usuario_logado" not in session or session["usuario_logado"] == None:
+    if "usuario_logado" not in session or session["usuario_logado"] is None:
         return redirect(url_for("login"))
 
     deleta_arquivo(id)
-
     Eventos.query.filter_by(id=id).delete()
     db.session.commit()
-    flash("Evento deletado com sucesso!")
+    flash("Evento deletado com sucesso!", "danger")
 
     return redirect(url_for("index"))
 
 
 @app.route("/uploads/<nome_arquivo>")
 def imagem(nome_arquivo):
-    return send_from_directory("uploads", nome_arquivo)
+    return send_from_directory(current_app.config["UPLOAD_PATH"], nome_arquivo)
 
 
 @app.route(

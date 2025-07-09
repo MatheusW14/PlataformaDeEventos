@@ -39,6 +39,11 @@
                         {{ form.participantes_manuais.label(class="form-label") }}
                         {{ form.participantes_manuais(class="form-control") }}
                     </div>
+
+                    <script>
+                        var input = document.querySelector('input[name="participantes_manuais"]');
+                        new Tagify(input);
+                    </script>
                     
                     <div class="d-flex justify-content-end gap-2 mt-4">
                         {{ form.salvar(class="btn btn-primary") }}

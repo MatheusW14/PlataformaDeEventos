@@ -18,8 +18,8 @@ class FormularioEvento(FlaskForm):
     tema = StringField("Tema", [DataRequired(), Length(min=1, max=40)])
     descricao = TextAreaField("Descrição", [DataRequired(), Length(min=1, max=200)])
 
-    participantes_manuais = TextAreaField(
-        "Participantes (um nome por linha)", render_kw={"rows": 5}
+    participantes_manuais = StringField(
+        "Participantes", render_kw={"placeholder": "Digite os nomes e tecle Enter"}
     )
 
     salvar = SubmitField("Salvar")
