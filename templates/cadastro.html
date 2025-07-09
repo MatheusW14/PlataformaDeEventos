@@ -1,0 +1,35 @@
+{% extends "template.html" %}
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="login-card"> <form method="POST" action="{{ url_for('registrar') }}">
+                {{ form.csrf_token() }}
+
+                <h2 class="text-center mb-4">Crie sua Conta</h2>
+
+                <div class="form-floating mb-3">
+                    {{ form.nome(class="form-control", placeholder="Nome Completo") }}
+                    {{ form.nome.label }}
+                </div>
+                <div class="form-floating mb-3">
+                    {{ form.nickname(class="form-control", placeholder="Usuário") }}
+                    {{ form.nickname.label }}
+                </div>
+                <div class="form-floating mb-3">
+                    {{ form.senha(class="form-control", placeholder="Senha") }}
+                    {{ form.senha.label }}
+                </div>
+                <div class="form-floating mb-4">
+                    {{ form.confirma_senha(class="form-control", placeholder="Confirme a Senha") }}
+                    {{ form.confirma_senha.label }}
+                </div>
+                
+                <div class="d-grid gap-2">
+                    {{ form.cadastrar(class="btn btn-primary btn-lg") }}
+                    <a class="btn btn-secondary" href="{{ url_for('login') }}">Já tenho uma conta</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

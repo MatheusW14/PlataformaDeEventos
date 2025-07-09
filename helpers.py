@@ -9,6 +9,7 @@ from wtforms import (
     DateField,
     TextAreaField,
 )
+from wtforms.validators import DataRequired, Length, EqualTo
 
 
 class FormularioEvento(FlaskForm):
@@ -27,12 +28,27 @@ class FormularioEvento(FlaskForm):
 
 class FormularioUsuario(FlaskForm):
     nickname = StringField(
-        "Nickname", [validators.DataRequired(), validators.Length(min=1, max=8)]
+        "Usuário", [validators.DataRequired(), validators.Length(min=1, max=8)]
     )
     senha = PasswordField(
         "Senha", [validators.DataRequired(), validators.Length(min=1, max=100)]
     )
     login = SubmitField("Login")
+
+
+class FormularioCadastro(FlaskForm):
+    nome = StringField("Nome Completo", [DataRequired(), Length(min=1, max=20)])
+    nickname = StringField("Usuário", [DataRequired(), Length(min=1, max=8)])
+    senha = PasswordField(
+        "Senha",
+        [
+            DataRequired(),
+            Length(min=4, max=100),
+            EqualTo("confirma_senha", message="As senhas devem ser iguais"),
+        ],
+    )
+    confirma_senha = PasswordField("Confirmação de Senha")
+    cadastrar = SubmitField("Cadastrar")
 
 
 def recupera_imagem(id):
