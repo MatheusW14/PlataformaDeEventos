@@ -5,7 +5,6 @@ from wtforms import (
     StringField,
     SubmitField,
     PasswordField,
-    validators,
     DateField,
     TextAreaField,
 )
@@ -26,16 +25,14 @@ class FormularioEvento(FlaskForm):
 
 
 class FormularioUsuario(FlaskForm):
-    nickname = StringField("Nickname", [DataRequired(), Length(min=1, max=20)])
+    nickname = StringField("Usuário", [DataRequired(), Length(min=1, max=20)])
     senha = PasswordField("Senha", [DataRequired(), Length(min=1, max=100)])
     login = SubmitField("Login")
 
 
 class FormularioCadastro(FlaskForm):
     nome = StringField("Nome Completo", [DataRequired(), Length(min=1, max=20)])
-    nickname = StringField(
-        "Nickname (para login)", [DataRequired(), Length(min=1, max=20)]
-    )
+    nickname = StringField("Usuário", [DataRequired(), Length(min=1, max=20)])
     senha = PasswordField(
         "Senha",
         [
