@@ -37,7 +37,7 @@ TABLES["Usuarios"] = (
     """
     CREATE TABLE `usuarios` (
         `nome` varchar(20) NOT NULL,
-        `nickname` varchar(8) NOT NULL,
+        `nickname` varchar(20) NOT NULL,
         `senha` varchar(100) NOT NULL,
         PRIMARY KEY (`nickname`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -47,7 +47,7 @@ TABLES["Usuarios"] = (
 TABLES["Participantes"] = (
     """
     CREATE TABLE `participantes` (
-        `usuario_nickname` varchar(8) NOT NULL,
+        `usuario_nickname` varchar(20) NOT NULL,
         `evento_id` int(11) NOT NULL,
         PRIMARY KEY (`usuario_nickname`, `evento_id`),
         FOREIGN KEY (`usuario_nickname`) REFERENCES `usuarios` (`nickname`),
@@ -77,6 +77,7 @@ usuarios = [
 ]
 cursor.executemany(usuario_sql, usuarios)
 
+conn.commit()
 
 eventos_sql = (
     "INSERT INTO eventos (nome, data, tema, descricao) VALUES (%s, %s, %s, %s)"

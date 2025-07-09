@@ -28,7 +28,7 @@ class FormularioEvento(FlaskForm):
 
 class FormularioUsuario(FlaskForm):
     nickname = StringField(
-        "Usuário", [validators.DataRequired(), validators.Length(min=1, max=8)]
+        "Usuário", [validators.DataRequired(), validators.Length(min=1, max=20)]
     )
     senha = PasswordField(
         "Senha", [validators.DataRequired(), validators.Length(min=1, max=100)]
@@ -38,7 +38,7 @@ class FormularioUsuario(FlaskForm):
 
 class FormularioCadastro(FlaskForm):
     nome = StringField("Nome Completo", [DataRequired(), Length(min=1, max=20)])
-    nickname = StringField("Usuário", [DataRequired(), Length(min=1, max=8)])
+    nickname = StringField("Usuário", [DataRequired(), Length(min=1, max=20)])
     senha = PasswordField(
         "Senha",
         [
