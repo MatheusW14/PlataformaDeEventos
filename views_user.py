@@ -21,15 +21,16 @@ def login():
 def autenticar():
     form = FormularioUsuario(request.form)
     usuario = Usuarios.query.filter_by(nickname=form.nickname.data).first()
-    senha = check_password_hash(usuario.senha, form.senha.data)
-    if usuario and senha:
-        session["usuario_logado"] = usuario.nickname
-        flash(usuario.nickname + " logado com sucesso!")
-        proxima_pagina = request.form["proxima"]
-        return redirect(proxima_pagina)
-    else:
-        flash("Usuário não logado.")
-        return redirect(url_for("login"))
+
+    if usuario:
+        if bcrypt.check_password_hash(usuario.senha, form.senha.data):
+            session["usuario_logado"] = usuario.nickname
+            flash(usuario.nickname + " logado com sucesso!")
+            proxima_pagina = request.form["proxima"]
+            return redirect(proxima_pagina)
+
+    flash("Falha no login. Verifique seu usuário e senha.")
+    return redirect(url_for("login"))
 
 
 @app.route("/cadastro")
